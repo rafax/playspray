@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.Props
 import akka.util.Timeout
-import controllers.BenchActor.{CalculateFib, NthFib}
+import controllers.BenchActor.{Sleep, CalculateFib, NthFib}
 import play.api.mvc._
 import play.libs.Akka
 
@@ -21,6 +21,15 @@ object Application extends Controller {
     (myActor ? CalculateFib(n)).mapTo[NthFib] map {
       f =>
         Ok(s"Fin #${f.n} = ${f.fib}")
+    }
+  }
+
+  def sleep(n: Int) = Action.async { implicit request =>
+    import akka.pattern.ask
+
+    (myActor ? Sleep(n)) map {
+      f =>
+        Ok(s"Slept for $n ms")
     }
   }
 }

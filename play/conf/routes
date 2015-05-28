@@ -4,8 +4,8 @@
 
 # Home page
 GET      /fib/:n                           controllers.Application.fib(n : Int)
-GET     /admin/metrics                     com.kenshoo.play.metrics.MetricsController.metrics
-# GET      /sleep                          controllers.Application.saveBook
+# GET     /admin/metrics                     com.kenshoo.play.metrics.MetricsController.metrics
+GET      /sleep/:n                          controllers.Application.sleep(n: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 # GET     /assets/*file               controllers.Assets.versioned(path="/public", file)

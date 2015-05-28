@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{Props, Actor}
 import akka.util.Timeout
-import com.example.BenchActor.{NthFib, CalculateFib}
+import com.example.BenchActor.{Sleep, NthFib, CalculateFib}
 import spray.routing._
 
 // we don't implement our route structure directly in the service actor because
@@ -39,13 +39,14 @@ trait MyService extends HttpService {
   import akka.pattern.ask
 
   val myRoute =
-    path("sleep" / Segment) { sleep =>
+    path("sleep" / Segment) { n =>
       get {
         complete {
+          val s = n.toInt
           import scala.concurrent.ExecutionContext.Implicits.global
-          scala.concurrent.Future {
-            Thread.sleep(sleep.toLong)
-            "Slept for " + sleep
+          (bench ? Sleep(s)) map {
+            f =>
+              s"Slept for $s ms"
           }
         }
       }
