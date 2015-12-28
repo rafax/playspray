@@ -1,34 +1,6 @@
 package com.example
 
-import akka.actor.Actor
-import akka.pattern.{pipe}
-import com.example.BenchActor.{NthFib, CalculateFib, Sleep}
-
 import scala.concurrent.{ExecutionContext, Future}
-
-object BenchActor {
-
-  case class Sleep(howLong: Long)
-
-  case class CalculateFib(n: Int)
-
-  case class NthFib(n: Int, fib: Long)
-
-}
-
-class BenchActor extends Actor with BenchService {
-
-  override implicit def ec: ExecutionContext = context.dispatcher
-
-  def receive = {
-    case Sleep(howLong) =>
-      sleep(howLong) pipeTo (sender())
-    case CalculateFib(n: Int) =>
-      fib(n) map {
-        res => NthFib(n, res)
-      } pipeTo (sender())
-  }
-}
 
 trait BenchService {
 

@@ -2,10 +2,11 @@ package com.example
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{Props, Actor}
+import akka.actor.Actor
 import akka.util.Timeout
-import com.example.BenchActor.{Sleep, NthFib, CalculateFib}
 import spray.routing._
+
+import scala.concurrent.ExecutionContext
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -24,9 +25,13 @@ class MyServiceActor extends Actor with MyService {
 // this trait defines our service behavior independently from the service actor
 trait MyService extends HttpService {
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  val bench = new BenchService {
+    override implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  }
   
   implicit val timeout = Timeout(10, TimeUnit.SECONDS)
-  val bench = actorRefFactory.actorOf(Props[BenchActor])
 
   def fib(n: Long): Long = {
     if (n <= 2) {
@@ -36,17 +41,13 @@ trait MyService extends HttpService {
     }
   }
 
-  import akka.pattern.ask
-
   val myRoute =
     path("sleep" / Segment) { n =>
       get {
         complete {
           val s = n.toInt
-          import scala.concurrent.ExecutionContext.Implicits.global
-          (bench ? Sleep(s)) map {
-            f =>
-              s"Slept for $s ms"
+          bench.sleep(s) map {
+            f => s"Slept for $s ms"
           }
         }
       }
@@ -54,9 +55,8 @@ trait MyService extends HttpService {
       path("fib" / Segment) { n =>
         get {
           complete {
-            import scala.concurrent.ExecutionContext.Implicits.global
-            (bench ? CalculateFib(n.toInt)).mapTo[NthFib] map { f =>
-              s"Fin #${f.n} = ${f.fib}"
+            bench.fib(n.toInt) map { fib =>
+              s"Fin #${n} = ${fib}"
             }
           }
         }

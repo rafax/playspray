@@ -16,22 +16,9 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
-# IntelliJ
-.idea/**
-play/.idea/**
-!.idea/vcs.xml
-!.idea/uiDesigner.xml
-/classes
-/dist
-/out
-/SDK/*SDK
-/target
-/*.bat
-*.class
-out
-build
-.DS_Store
-*~
-target/
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 
-testdata/debugger
+*.iml
+
+## Directory-based project format:
+.idea/
